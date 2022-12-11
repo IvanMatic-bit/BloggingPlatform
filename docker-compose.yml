@@ -1,0 +1,33 @@
+version: '3'
+services:
+#mssql docker
+  bloggingplatform-sql:
+    image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=QWElkj132!
+      - MSSQL_PID=Developer
+    ports:
+      - 1401:1433
+    networks:
+      - bloggingplatformnet
+
+  bloggingplatform-api:
+    restart: unless-stopped
+    build:
+      context: .
+    environment:
+      - ConnectionStrings:DefaultConnection=Server=bloggingplatform-sql,1433;Database=bloggingplatform;User=sa;Password=QWElkj132!;ConnectRetryCount=0
+    ports:
+      - 5010:5010
+    networks:
+      - bloggingplatformnet      
+    links:
+      - bloggingplatform-sql
+    depends_on:
+      - bloggingplatform-sql
+      
+networks:
+  bloggingplatformnet:
+    driver: bridge      
